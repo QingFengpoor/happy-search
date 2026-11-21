@@ -1,0 +1,16 @@
+{
+  "name": "开心连连看",
+  "short_name": "连连看",
+  "description": "轻量休闲消除小游戏：点选两个相同图案，连线转弯不超过两次即可消除。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fdf3e7",
+  "theme_color": "#ff8c5a",
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

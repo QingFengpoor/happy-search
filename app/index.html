@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ff8c5a">
+<meta name="description" content="开心连连看 —— 轻量休闲消除小游戏，点选两个相同图案，连线不超过两个弯即可消除。">
+<title>开心连连看</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== 标题界面 ===== -->
+  <section id="screen-title" class="screen">
+    <div class="title-card">
+      <img class="title-logo" src="./icons/icon-512.png" alt="开心连连看图标" width="128" height="128">
+      <h1 class="title-name">开心连连看</h1>
+      <p class="title-sub">普通消除 + 克制消除闯关 + 双无尽模式</p>
+      <button id="btn-start" class="btn btn-primary btn-lg">开始游戏</button>
+      <div class="mode-select" role="radiogroup" aria-label="游戏模式">
+        <button class="mode-btn" id="mode-timed" role="radio" aria-checked="true">⏱ 限时挑战</button>
+        <button class="mode-btn" id="mode-casual" role="radio" aria-checked="false">🍵 休闲模式</button>
+      </div>
+      <p class="mode-desc" id="mode-desc">在倒计时结束前消除全部图案</p>
+      <div class="level-select" id="level-select" aria-label="选择关卡"></div>
+      <div class="theme-select" role="radiogroup" aria-label="图案主题">
+        <button class="theme-btn active" data-theme="fruit">🍎 水果</button>
+        <button class="theme-btn" data-theme="desert">🧁 甜品</button>
+        <button class="theme-btn" data-theme="animal">🐱 动物</button>
+      </div>
+      <div class="endless-box" id="endless-box">
+        <div class="endless-btns">
+          <button id="btn-endless" class="btn btn-secondary">♾ 闯关无尽</button>
+          <button id="btn-survival" class="btn btn-secondary">♾ 生存无尽</button>
+        </div>
+        <span class="endless-best" id="endless-best"></span>
+      </div>
+      <div class="psr-box">
+        <button id="btn-psr" class="btn btn-secondary">🐯 克制消除 · 开始闯关</button>
+        <div class="psr-select" id="psr-select" aria-label="克制消除关卡选择"></div>
+      </div>
+      <div class="title-footer">
+        <button id="btn-mute-title" class="btn btn-ghost" aria-label="音效开关">
+          <span class="sound-ico" aria-hidden="true"></span><span class="mute-label">音效：开</span>
+        </button>
+        <span class="best-total" id="best-total"></span>
+      </div>
+      <details class="howto">
+        <summary>特殊元素说明</summary>
+        <ul>
+          <li>🪨 石板：不可消除，会挡住连线</li>
+          <li>🧊 冰冻：先消除它相邻的一对图案才能解冻</li>
+          <li>🌈 彩虹：可以跟任意图案配对消除</li>
+          <li>⏰ 时钟：消除后时间 +15 秒（限时挑战）</li>
+          <li>🐯 克制消除：7 关闯关，每关一组闭环克制链（石头剪刀布→风林火山→五行→三国→西游→斗兽棋→十二生肖），克制链常驻显示在关卡页面顶部，点克制者吃掉被克者，被克者消失、克制者留下继续吃</li>
+          <li>♾ 生存无尽：盘面 7×7 恒定，消除一对原地补充一对并奖励时间，图案渐多（上限 12 种）、奖时渐少（下限 2 秒），尽量存活刷高分</li>
+        </ul>
+      </details>
+      <details class="howto" id="log-panel">
+        <summary>运行日志（排查问题用）</summary>
+        <div class="log-tools">
+          <button id="btn-log-refresh" class="btn btn-ghost">刷新</button>
+          <button id="btn-log-copy" class="btn btn-ghost">复制30条</button>
+          <button id="btn-log-copy50" class="btn btn-ghost">复制50条</button>
+          <button id="btn-log-key" class="btn btn-ghost">关键</button>
+          <button id="btn-log-copy-all" class="btn btn-ghost">全部</button>
+          <button id="btn-log-export" class="btn btn-ghost">导出文件</button>
+          <button id="btn-log-clear" class="btn btn-ghost">清空</button>
+        </div>
+        <pre id="log-view" class="log-view" aria-live="polite"></pre>
+      </details>
+    </div>
+  </section>
+
+  <!-- ===== 游戏界面 ===== -->
+  <section id="screen-game" class="screen" hidden>
+    <header class="hud">
+      <div class="hud-row">
+        <span class="hud-badge" id="hud-level">第 1 关</span>
+        <div class="hud-score">
+          <span class="hud-score-num" id="hud-score">0</span>
+          <span class="hud-combo" id="hud-combo" hidden></span>
+        </div>
+        <span class="hud-left" id="hud-left">剩 0 对</span>
+      </div>
+      <span class="hud-target" id="hud-target" hidden></span>
+      <div id="chain-bar" class="chain-bar" hidden></div>
+      <div class="timer-track" role="progressbar" aria-label="剩余时间">
+        <div class="timer-fill" id="timer-fill"></div>
+        <span class="timer-text" id="timer-text">0:00</span>
+      </div>
+    </header>
+
+    <div class="board-outer">
+      <div class="board-wrap" id="board-wrap">
+        <div class="board" id="board" role="grid" aria-label="连连看棋盘"></div>
+        <svg class="link-layer" id="link-layer" aria-hidden="true"></svg>
+        <div class="fx-layer" id="fx-layer" aria-hidden="true"></div>
+      </div>
+    </div>
+
+    <nav class="action-bar" aria-label="游戏操作">
+      <button id="btn-hint" class="btn btn-tool">
+        <svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2Zm-3 17h6v1a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-1Z" fill="currentColor"/></svg>
+        提示
+      </button>
+      <button id="btn-shuffle" class="btn btn-tool">
+        <svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M17 3h4v4h-2V6.4l-4.3 4.3-1.4-1.4L17.6 5H17V3ZM3 7h3.6l9 10H21v2h-6.4l-9-10H3V7Zm14.6 8.6L19 17.2V16h2v4h-4v-2h1.2l-2-2 1.4-1.4ZM3 17h2.6l2.3-2.5 1.4 1.4L6.4 19H3v-2Z" fill="currentColor"/></svg>
+        洗牌 <span class="tool-count" id="shuffle-count">3</span>
+      </button>
+      <button id="btn-mute-game" class="btn btn-tool" aria-label="音效开关">
+        <svg viewBox="0 0 24 24" class="ico ico-sound" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/><path class="sound-wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="sound-off" d="m16 9 6 6m0-6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"/></svg>
+        音效
+      </button>
+      <button id="btn-pause" class="btn btn-tool">
+        <svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor"/></svg>
+        暂停
+      </button>
+    </nav>
+  </section>
+
+  <!-- ===== 通用遮罩（暂停 / 过关 / 失败 / 通关） ===== -->
+  <div id="overlay" class="overlay" hidden>
+    <div class="overlay-card" role="dialog" aria-modal="true" id="overlay-card"></div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+</div>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
