@@ -46,6 +46,9 @@ button{cursor:pointer;font:inherit;color:inherit;background:none;border:none;
 .screen{flex:1;display:flex;flex-direction:column;width:100%;max-width:520px;margin:0 auto;
   padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
 .screen[hidden]{display:none}
+/* 断点里的 #screen-game{display:flex} 是 ID 选择器(1-0-0)，优先级高于 .screen[hidden](0-2-0)，
+   会让 hidden 属性在宽屏下失效、标题页与游戏页同时显示。这里用 !important 保证隐藏优先。 */
+#screen-title[hidden], #screen-game[hidden]{display:none!important}
 
 /* ===== 按钮 ===== */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;
