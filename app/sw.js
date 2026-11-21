@@ -8,7 +8,7 @@
  * 发版约定：每次发布同时递增此处的 CACHE 与 main.js 里的 BUILD。
  * 缓存名变化会在 activate 时清掉所有旧缓存，避免新旧代码混跑。
  */
-const CACHE = "llk-v24";
+const CACHE = "llk-v25";
 const ASSETS = [
   "./",
   "./index.html",

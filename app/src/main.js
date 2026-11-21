@@ -54,7 +54,7 @@ const CLOCK_BONUS = 15;      // 时钟块加时（秒）
 /* ---------- 运行日志（排查问题用：关键事件 + 计数快照，可开关可导出） ---------- */
 const LOG_KEY = "llk_log_v1";
 const LOG_MAX = 300;
-const BUILD = "v24";   /* 每次发布递增：日志里带版本号，便于确认玩家跑的是不是最新代码 */
+const BUILD = "v25";   /* 每次发布递增：日志里带版本号，便于确认玩家跑的是不是最新代码 */
 let gameLog = [];
 let logSeq = 0;
 try{
@@ -495,8 +495,10 @@ function layoutBoard(){
   const bw = G.cols * cell + (G.cols - 1) * gap + pad * 2;
   const bh = G.rows * cell + (G.rows - 1) * gap + pad * 2;
   els.link.setAttribute("viewBox", `0 0 ${bw} ${bh}`);
-  /* 宽屏（分栏布局）：让棋盘相对面板垂直居中，避免顶到侧栏顶部 */
-  outer.style.alignItems = W >= 700 ? "center" : "stretch";
+  /* 宽屏（分栏布局）：让棋盘相对面板垂直居中，避免顶到侧栏顶部。
+     以所在容器的实际宽度判定，因为棋盘容器自身宽度总是远小于 700px。 */
+  const hostW = (outer.parentElement || outer).clientWidth;
+  outer.style.alignItems = hostW >= 700 ? "center" : "stretch";
   G._metrics = { cell, gap, pad };
 }
 

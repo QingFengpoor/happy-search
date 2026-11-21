@@ -195,33 +195,33 @@ button{cursor:pointer;font:inherit;color:inherit;background:none;border:none;
 .toast[hidden]{display:none}
 @keyframes toast-in{from{transform:translate(-50%,10px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 
-/* ===== 平板 / PC 横屏适配：棋盘与操作面板左右分栏 ===== */
+/* ===== 平板 / PC 横屏适配：棋盘在左，HUD + 工具栏在右侧一栏 ===== */
+/* 不改 DOM：移动端视觉顺序是 HUD → 棋盘 → 工具栏（DOM 顺序即如此）。
+   PC 端用 grid 把棋盘放左列，HUD 与工具栏堆叠进右列。 */
 @media (min-width:900px) and (min-height:520px){
-  #screen-game{max-width:1180px;display:flex;flex-direction:row;align-items:stretch;gap:24px}
-  #screen-game .board-outer{flex:1.6;order:1}
-  /* 操作面板作为独立侧栏：HUD 与工具栏合成一栏 */
-  #screen-game .hud{order:2;flex:1;justify-content:center;max-width:360px;gap:14px;padding:16px;
+  #screen-game{max-width:1180px;display:grid;
+    grid-template-columns:minmax(0,1fr) 320px;
+    grid-template-rows:auto 1fr;
+    grid-template-areas:"board hud" "board bar";
+    gap:12px 24px;align-content:stretch}
+  #screen-game .board-outer{grid-area:board;flex:none;min-width:0}
+  #screen-game .hud{grid-area:hud;align-self:end;justify-content:flex-start;gap:14px;padding:16px;
     background:var(--card);border-radius:20px;
     box-shadow:0 12px 32px oklch(0.6 0.1 50 / .12),inset 0 0 0 1px oklch(1 0 0 / .6)}
-  #screen-game .action-bar{order:3;flex-direction:row;flex:none;width:100%;max-width:360px;
-    justify-content:flex-start;align-items:flex-start;align-self:flex-start;
-    padding-top:0;gap:12px;margin-top:12px}
-  #screen-game .btn-tool{min-height:56px;flex:1;min-width:0}
+  #screen-game .action-bar{grid-area:bar;flex-direction:row;align-self:start;
+    width:100%;padding-top:0;gap:12px}
+  #screen-game .btn-tool{min-height:64px;flex:1;min-width:0}
 }
-/* 笔记本中等高度：工具栏与 HUD 作为一个整体垂直居中 */
-@media (min-width:900px) and (min-height:520px) and (max-height:899px){
-  #screen-game{align-items:center}
-  #screen-game .hud{justify-content:flex-start}
-  #screen-game .action-bar{margin-top:12px}
-}
-/* 大桌面高窗口：内容在各自顶部对齐，工具栏跟随 HUD */
-@media (min-width:900px) and (min-height:900px){
-  #screen-game .hud{justify-content:flex-start}
-}
-@media (min-width:900px) and (min-height:520px) and (max-width:1199px){
-  /* 中屏（笔记本）：侧栏纵向排列，工具按钮恢复竖排以节省宽度 */
-  #screen-game .hud{max-width:300px}
-  #screen-game .action-bar{flex-direction:column;width:96px;max-width:none;margin-top:0}
+/* 大桌面：侧栏加宽，棋盘格子更大 */
+@media (min-width:1440px) and (min-height:700px){
+  #screen-game{max-width:1320px;grid-template-columns:minmax(0,1fr) 380px;gap:12px 32px}
+  .title-card{max-width:680px;padding:48px 40px 32px}
+  .title-logo{width:144px;height:144px}
+  .title-name{font-size:44px}
+  .level-btn{width:64px;height:64px}
+  .hud-score-num{font-size:32px}
+  .timer-track{height:26px}
+  .timer-text{font-size:14px}
 }
 /* 横屏手机（高度不够放右侧面板）：棋盘放大，HUD 与工具栏压扁横排 */
 @media (min-width:700px) and (max-height:519px){
@@ -235,7 +235,6 @@ button{cursor:pointer;font:inherit;color:inherit;background:none;border:none;
 }
 @media (min-width:1440px) and (min-height:700px){
   #screen-game{max-width:1320px;gap:32px}
-  #screen-game .hud{max-width:400px}
   .title-card{max-width:680px;padding:48px 40px 32px}
   .title-logo{width:144px;height:144px}
   .title-name{font-size:44px}
